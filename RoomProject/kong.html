@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Dream House</title>
+    <script src="libs/aframe.min.js"></script>
+    <script src="libs/aframe-extras.min.js"></script>
+
+    <script>
+        // Set up the component to handle turning on and off the main lights.
+        AFRAME.registerComponent("toggle-main-lights", {
+            init: function() {
+                var state = true;
+                var self = this.el;
+                self.addEventListener("click", function(evt) {
+                    var newIntensity;
+                    if (state) {
+                        newIntensity = 0;
+                        state = false;
+                        document.querySelector("#Lever").emit("lightOff");
+                    } else {
+                        newIntensity = 0.75;
+                        state = true;
+                        document.querySelector("#Lever").emit("lightOn")
+                    }
+
+                    var lights = document.querySelectorAll(".MainLighting");
+                    for (var i = 0; i < lights.length; i++) {
+                        lights[i].setAttribute("light", {intensity: newIntensity}, false);
+                    }
+                });
+            }
+        });
+
+        // Set up the component to handle turning on and off the TV screen.
+        AFRAME.registerComponent("tv-screen", {
+            init: function() {
+                var on = false;
+                var self = this.el;
+                self.addEventListener("click", function(evt) {
+                    var newMaterial;
+                    var newLighting;
+                    if (on) {
+                        newMaterial = {shader: "standard", color : "black"};
+                        newLighting = {intensity: "0"};
+
+                        on = false;
+
+
+                    } else {
+                        newMaterial = {shader: "flat", src: "#jiangzemin"};
+                        newLighting = {type: "point", intensity: "0.3", distance: "10"};
+                        var video= document.querySelector("#jiangzemin");
+                        video.play();
+                        on = true;
+                    }
+                    self.setAttribute("material", newMaterial, true);
+                    self.setAttribute("light", newLighting, false);
+                    document.querySelector("#jiangzemin").muted = !on;
+
+                });
+            }
+        });
+
+        // Set up the component to handle opening and closing the door.
+        AFRAME.registerComponent("door-toggle", {
+            init: function() {
+                var open = false;
+                var self = this.el;
+                self.addEventListener("click", function(evt) {
+                    if (open) {
+                        open = false;
+                        self.emit("doorClosing");
+                    } else {
+                        open = true;
+                        self.emit("doorOpening");
+                    }
+                })
+            }
+        });
+
+        // Set up component to handle turning on and off the desk lamp light.
+        AFRAME.registerComponent("desk-lamp-toggle", {
+            init: function() {
+                var on = false;
+                var self = this.el;
+                self.addEventListener("click", function(evt) {
+                    var newLighting;
+                    if (on) {
+                        on = false;
+                        newLighting = {intensity: "0"};
+                    } else {
+
+                        on = true;
+                        newLighting = {intensity: "0.6"};
+                    }
+
+                    self.setAttribute("light", newLighting, false);
+                })
+            }
+        });
+
+
+        // <!--播放收音机-->
+        AFRAME.registerComponent("myboom", {
+            init: function() {
+                var on = false;
+                var self = this.el;
+                self.addEventListener("click", function(evt) {
+                    //var newLighting;
+                    if (on) {
+                        on = false;
+                        var audio = document.getElementById("test_audio");
+                        audio.pause();
+                        // newLighting = {intensity: "0"};
+                    } else {
+                        var audio = document.getElementById("test_audio");
+                        audio.play();
+                        on = true;
+                        // newLighting = {intensity: "0.6"};
+                    }
+
+                    // self.setAttribute("light", newLighting, false);
+                })
+            }
+        });
+
+
+        // 窗帘
+
+        AFRAME.registerComponent("mycurtian", {
+            init: function() {
+                var on = false;
+                var self = this.el;
+                self.addEventListener("click", function(evt) {
+                    //var newLighting;
+                    if (on) {
+                        on = false;
+                        self.emit("Opening");
+                        // newLighting = {intensity: "0"};
+                    } else {
+                        // var audio = document.getElementById("test_audio");
+                        // audio.play();
+                        on = true;
+                        //self.emit("Toleft");
+                        self.emit("Closing");
+
+                        // newLighting = {intensity: "0.6"};
+                    }
+
+                    // self.setAttribute("light", newLighting, false);
+                })
+            }
+        });
+
+    </script>
+</head>
+<body>
+<a-scene light="defaultLightsEnabled: false" shadow="type=pcfsoft">
+    <a-entity light="type: ambient; intensity: 0.1"></a-entity>
+
+    <a-assets timeout="10000">
+        <a-asset-item id="tv" src="assets/led_tv.gltf"/>
+        <a-asset-item id="sofa" src="assets/sofa.gltf"/>
+        <a-asset-item id="curtain" src="assets/curtain.glb"/>
+        <a-asset-item id="entertainment_center" src="assets/entertainment_center.gltf"/>
+        <a-asset-item id="bookshelf" src="assets/bookshelf.gltf"/>
+        <a-asset-item id="ceiling_light" src="assets/ceiling_light.gltf"/>
+        <a-asset-item id="dining_table" src="assets/dining_table.gltf"/>
+        <a-asset-item id="chair" src="assets/chair.gltf"/>
+        <a-asset-item id="pool_table" src="assets/pool_table.gltf"/>
+        <a-asset-item id="desk" src="assets/desk.gltf"/>
+        <a-asset-item id="lamp" src="assets/lamp.gltf"/>
+        <a-asset-item id="clock" src="assets/clock.gltf"/>
+        <a-asset-item id="cup" src="assets/cup.gltf"/>
+        <a-asset-item id="Boombox" src="assets/Models/Boombox.gltf"/>
+        <video id="jiangzemin" src="vids/pokemon.mp4"  loop="true" muted="true"/>
+        <audio id="hitclap" src="assets/sound/normal-hitclap9.wav"   preload   hidden></audio>
+        <a-asset-item id="creeper_coin" src="assets/Models/creeper_coin/creeper_coin.obj"></a-asset-item>
+        <img id="creeper_image" src="images/c.jpg">
+        <audio id="test_audio" src="assets/sound/Deep Breaths (Ableton).wav"></audio>
+        <!--<a-asset-item id="table-obj" src="assets/Models/side-table.obj"></a-asset-item>-->
+        <!--<a-asset-item id="table-mtl" src="assets/Models/side-table.mtl"></a-asset-item>-->
+        <a-asset-item id="mysidetable" src="assets/Models/sidetable.gltf"/>
+        <a-asset-item id="refrigerator" src="assets/Models/refrigerator.gltf"/>
+        <a-asset-item id="football" src="assets/Models/football.gltf"/>
+        <a-asset-item id="piano" src="assets/Models/piano.gltf"/>
+    </a-assets>
+
+    <!--<a-sky color="#191970"></a-sky>-->
+    <a-sky color="#87CEEB"></a-sky>
+    <a-entity position="0 0.5 0">
+        <a-camera universal-controls  >
+            <a-entity raycaster="far: 150; objects: .intersectable" cursor geometry="primitive: ring; radiusOuter: 0.015;
+                              radiusInner: 0.01; segmentsTheta: 32" material="color: #283644; shader: flat" position=" 0 0 -0.75"></a-entity>
+        </a-camera>
+    </a-entity>
+
+    <!-- Light Switch -->
+    <a-entity toggle-main-lights class="intersectable" position="-13.5, 1.5, 9.9">
+        <a-text value="Light" align="center" width="6" position="0 1 -1" color="blue" rotation="0 180 0"></a-text>
+        <a-entity geometry="primitive: box; depth: 0.1; height: 0.5; width: 0.25" material="color: lightgrey"></a-entity>
+        <a-entity id="Lever" geometry="primitive: box; depth: 0.3; height: 0.1; width: 0.1" material="color: white" rotation="45 0 0">
+            <a-animation attribute="rotation" begin="lightOn" from="-45 0 0" to="45 0 0" dur="500"></a-animation>
+            <a-animation attirbute="rotation" begin="lightOff" from="45 0 0" to="-45 0 0" dur="500"></a-animation>
+        </a-entity>
+    </a-entity>
+
+
+
+    <!--<a-grid static-body material="visible: false;"></a-grid>-->
+
+    <!--&lt;!&ndash; room bounds &ndash;&gt;-->
+    <!--<a-plane static-body material="visible: false" height="0.1" width:="30" position="0 5 10" ></a-plane>-->
+    <!--<a-plane static-body material="visible: false" height="2.7432" width="3.3528" position="1.6764 1.3716 -3.6576" rotation="0 0 0"></a-plane>-->
+    <!--<a-plane static-body material="visible: false" height="2.7432" width="3.3528" position="1.6764 1.3716 0" rotation="0 180 0"></a-plane>-->
+    <!--<a-plane static-body material="visible: false" height="2.7432" width="3.048" position="3.6576 1.3716 -1.828" rotation="0 -90 0"></a-plane>-->
+    <!--<a-plane static-body material="visible: false" height="2.7432" width="0.43" position="3.5052 1.3716 -3.5052" rotation="0 -45 0"></a-plane>-->
+    <!--<a-plane static-body material="visible: false" height="2.7432" width="0.43" position="3.5052 1.3716 -0.1524" rotation="0 -135 0"></a-plane>-->
+    <!--&lt;!&ndash;Floor &ndash;&gt;-->
+    <a-entity  shadow = "receive: true"   geometry="primitive:box; depth: 20; height:0.1; width: 30" position="0 0 0" material="src: url(images/Maple_honey.png); repeat: 30 20; metalness: 0; roughness: 1 " ></a-entity>
+
+    <!--Ceiling -->
+    <a-entity geometry="primitive:box; depth: 20; height:0.1; width: 30" position="0 10 0" material="src: url(images/ceiling.jpg); repeat: 10 15; metalness: 0; roughness: 1"></a-entity>
+
+    <!--North Wall-->
+    <a-entity   geometry="primitive: box; depth: 0.2; height:10; width: 30" position="0 5 10" material="src: url(images/wall2.jpg); repeat: 30 10; metalness: 0; roughness: 1"></a-entity>
+    <!--East Wall-->
+    <a-entity   geometry="primitive: box; depth: 17.5; height: 1.25; width: 0.2" position="15 9.375 0" material="src: url(images/wall2.jpg); repeat: 17.5 1.25; metalness: 0; roughness: 1"></a-entity>
+    <a-entity   geometry="primitive: box; depth: 17.5; height: 1.25; width: 0.2" position="15 0.625 0" material="src: url(images/wall2.jpg); repeat: 17.5 1.25; metalness: 0; roughness: 1"></a-entity>
+    <a-entity    geometry="primitive: box; depth: 1.25; height: 10; width: 0.2" position="15 5 9.375" material="src:url(images/wall2.jpg); repeat: 1.25 10; metalness: 0; roughness: 1"></a-entity>
+    <a-entity    geometry="primitive: box; depth: 1.25; height: 10; width: 0.2" position="15 5 -9.375" material="src:url(images/wall2.jpg); repeat: 1.25 10; metalness: 0; roughness: 1"></a-entity>
+    <!--Window in East Wall -->
+    <a-entity   shadow = "receive：false"    geometry="primitive: box; depth: 17.5; height: 7.5; width: 0.1"
+                position="15 5 0" material="src: url(images/glass.jpg); repeat: 15 7.5; opacity: 0.3;
+                      transparent: true; metalness: 0.1"></a-entity>
+
+    <!--<a-entity geometry="primitive: box; depth: 9; height: 7.5; width: 0.1"-->
+    <!--position="15 5 0" material="src: url(images/glass.jpg); repeat: 7.5 7.5; opacity: 0.3;-->
+    <!--transparent: true; metalness: 0.1"></a-entity>-->
+    <!-- West Wall-->
+    <a-entity   shadow = "receive：true"   geometry="primitive: box; depth: 15; height: 10; width: 0.2" position="-15 5 -2.5" material="src: url(images/wall2.jpg); repeat: 15 10; metalness: 0; roughness: 1"></a-entity>
+    <a-entity   shadow = "receive：true"   geometry="primitive: box; depth: 2; height: 10; width: 0.2" position="-15 5 9" material="src: url(images/wall2.jpg); repeat: 2 10; metalness: 0; roughness: 1"></a-entity>
+    <a-entity    shadow = "receive：true"  geometry="primitive: box; depth: 3; height: 5; width: 0.2" position="-15 7.5 6.5" material="src: url(images/wall2.jpg); repeat: 3 5; metalness: 0; roughness: 1"></a-entity>
+
+    <!--South Wall-->
+    <a-entity  shadow = "receive：true"   geometry="primitive: box; depth: 0.2; height:10; width: 30" position="0 5 -10" material="src: url(images/wall2.jpg); repeat: 30 10; metalness: 0; roughness: 1"></a-entity>
+
+    <!-- Grass Outside-->
+    <a-entity     shadow = "receive：false"    geometry="primitive: box; depth: 500; height: 0.05; width: 500" position="0 0 0" material="src: url(images/grass.jpg); repeat: 500 500; metalness: 0; roughness: 1"></a-entity>
+
+
+
+
+    <!--<a-entity myboom  class="intersectable"   position="10 1.35 -5" rotation="0 -180 0">-->
+
+        <!--<a-gltf-model      src="#Boombox"  scale="0.2 0.2 0.2" shadow="receive: false"></a-gltf-model>-->
+    <!--</a-entity>-->
+    <!--&lt;!&ndash; TV &ndash;&gt;-->
+    <!--<a-entity position="0 1 -9" rotation="0 0 0">-->
+        <!--<a-text value="" align="center" width="6" position="0 3 0" color="blue"></a-text>-->
+        <!--<a-gltf-model src="#tv" scale="0.2 0.2 0.2" shadow="receive: false"></a-gltf-model>-->
+        <!--<a-entity tv-screen class="intersectable" geometry="primitive: box; depth: 0.01; height: 1.4; width: 2.5" material="color: black" position="0 0.9 0.148"></a-entity>-->
+    <!--</a-entity>-->
+
+    <!--&lt;!&ndash; Sofa &ndash;&gt;-->
+    <!--<a-entity position="6 0 -5" rotation="0 90 0" >-->
+        <!--<a-gltf-model src="#sofa" scale="0.002 0.002 0.002" shadow="receive: false"></a-gltf-model>-->
+    <!--</a-entity>-->
+
+    <!--&lt;!&ndash; Curtain glass&ndash;&gt;-->
+    <!--&lt;!&ndash;-->
+    <!--与原点的距离-->
+    <!--与地板的距离-->
+
+    <!--&ndash;&gt;-->
+    <!--<a-entity   mycurtian class="intersectable"  position="14 1.5 0" rotation="0 0 0" >-->
+        <!--<a-gltf-model    position="0 0 0"    src="#curtain" scale="0.0045 0.0025 0.003">-->
+
+        <!--</a-gltf-model>-->
+        <!--<a-animation attribute="scale" begin="Closing" from="1 1 1"  to="1 1 0.22"  easing="linear"    dur="6000"></a-animation>-->
+        <!--<a-animation attribute="position" begin="Toleft"  to="14 1.5 7"    dur="6000"></a-animation>-->
+
+        <!--<a-animation attribute="scale" begin="Opening" from="1 1 0.22"  to="1 1 1"  easing="linear"    dur="6000"></a-animation>-->
+
+    <!--</a-entity>-->
+
+    <!--&lt;!&ndash; Bookshelf &ndash;&gt;-->
+    <!--<a-entity rotation="0 90 0" position="9 0 9.5">-->
+        <!--<a-gltf-model src="#bookshelf" scale="0.25 0.25 0.25"></a-gltf-model>-->
+    <!--</a-entity>-->
+
+    <!--&lt;!&ndash; Entertainment Center &ndash;&gt;-->
+    <!--<a-entity position="0 0 -9">-->
+        <!--<a-gltf-model src="#entertainment_center" scale="0.235 0.235 0.235"></a-gltf-model>-->
+    <!--</a-entity>-->
+
+    <!-- Ceiling Lights -->
+    <a-entity position="-5 3 0">
+        <a-entity class="MainLighting" light="type: point; intensity: 0.75; distance: 50; castShadow:false;" position="0 2 0"></a-entity>
+        <a-gltf-model src="#ceiling_light" scale="25 25 25"></a-gltf-model>
+    </a-entity>
+
+    <a-entity position="5 3 0">
+        <a-entity class="MainLighting" light="type: point; intensity: 0.75; distance: 50; castShadow:true" position="0 2 0"></a-entity>
+        <a-gltf-model src="#ceiling_light" scale="25 25 25"></a-gltf-model>
+    </a-entity>
+
+    <!--&lt;!&ndash; Dining Table &ndash;&gt;-->
+    <!--<a-entity position="7 0 6">-->
+        <!--<a-gltf-model src="#dining_table" scale="1.5 1.5 1.5"></a-gltf-model>-->
+    <!--</a-entity>-->
+
+    <!--&lt;!&ndash; Dining Chairs &ndash;&gt;-->
+    <!--<a-entity position="7 0 8">-->
+        <!--<a-gltf-model src="#chair" scale="15 15 15"></a-gltf-model>-->
+    <!--</a-entity>-->
+
+    <!--<a-entity position="10 0 7" rotation="0 90 0">-->
+        <!--<a-gltf-model src="#chair" scale="15 15 15"></a-gltf-model>-->
+    <!--</a-entity>-->
+
+    <!--&lt;!&ndash; Pool Table &ndash;&gt;-->
+    <!--<a-entity position="10 0 -5">-->
+        <!--<a-gltf-model src="#pool_table"  shadow = "receive：true"  scale="0.04 0.04 0.04" shadow="receive: false"></a-gltf-model>-->
+    <!--</a-entity>-->
+
+    <!--&lt;!&ndash; Desk &ndash;&gt;-->
+    <!--<a-entity position="-10 0 -9">-->
+        <!--<a-gltf-model src="#desk" scale="0.0018 0.0018 0.0018"></a-gltf-model>-->
+    <!--</a-entity>-->
+
+    <!--&lt;!&ndash; Desk Lamp &ndash;&gt;-->
+    <!--<a-entity desk-lamp-toggle class="intersectable" position="-9.5 1.3 -9.2" light="type: point; intensity: 0; distance: 15">-->
+        <!--<a-text value="" align="center" width="6" position="0 1 0" color="blue"></a-text>-->
+        <!--<a-gltf-model src="#lamp" scale="0.02 0.02 0.02"></a-gltf-model>-->
+    <!--</a-entity>-->
+
+    <!--&lt;!&ndash; Desk Lamp1 &ndash;&gt;-->
+    <!--<a-entity desk-lamp-toggle class="intersectable" position="9 6.5 9.5" light="type: point; intensity: 0; distance: 15" rotation="0 -180 0">-->
+        <!--<a-text  align="center" width="6" position="0 1 0" color="blue"></a-text>-->
+        <!--<a-gltf-model src="#lamp" scale="0.02 0.02 0.02"></a-gltf-model>-->
+    <!--</a-entity>-->
+    <!--<a-entity desk-lamp-toggle class="intersectable" position="6 6.5 9.5" light="type: point; intensity: 0; distance: 15" rotation="0 -180 0">-->
+        <!--<a-text  align="center" width="6" position="0 1 0" color="blue"></a-text>-->
+        <!--<a-gltf-model src="#lamp" scale="0.02 0.02 0.02"></a-gltf-model>-->
+    <!--</a-entity>-->
+    <!--<a-entity desk-lamp-toggle class="intersectable" position="3.5 6.5 9.5" light="type: point; intensity: 0; distance: 15" rotation="0 -180 0">-->
+        <!--<a-text  align="center" width="6" position="0 1 0" color="blue"></a-text>-->
+        <!--<a-gltf-model src="#lamp" scale="0.02 0.02 0.02"></a-gltf-model>-->
+    <!--</a-entity>-->
+    <!--<a-entity desk-lamp-toggle class="intersectable" position="0.5 6.5 9.5" light="type: point; intensity: 0; distance: 15" rotation="0 -180 0">-->
+        <!--<a-text  align="center" width="6" position="0 1 0" color="blue"></a-text>-->
+        <!--<a-gltf-model src="#lamp" scale="0.02 0.02 0.02"></a-gltf-model>-->
+    <!--</a-entity>-->
+    <!--<a-entity desk-lamp-toggle class="intersectable" position="-2.5 6.5 9.5" light="type: point; intensity: 0; distance: 15" rotation="0 -180 0">-->
+        <!--<a-text  align="center" width="6" position="0 1 0" color="blue"></a-text>-->
+        <!--<a-gltf-model src="#lamp" scale="0.02 0.02 0.02"></a-gltf-model>-->
+    <!--</a-entity>-->
+    <!--<a-entity desk-lamp-toggle class="intersectable" position="-5.5 6.5 9.5" light="type: point; intensity: 0; distance: 15" rotation="0 -180 0">-->
+        <!--<a-text  align="center" width="6" position="0 1 0" color="blue"></a-text>-->
+        <!--<a-gltf-model src="#lamp" scale="0.02 0.02 0.02"></a-gltf-model>-->
+    <!--</a-entity>-->
+
+    <!--&lt;!&ndash;<a-text value="Door" align="center" width="6" position="-13.5 2.5 7" rotation="0 90 0" color="blue"></a-text>&ndash;&gt;-->
+    <!--&lt;!&ndash;&lt;!&ndash; Door &ndash;&gt;&ndash;&gt;-->
+    <!--<a-entity  light = “type：directional; castShadow：false;”  position = “-15 2.5 8” > </a-entity >-->
+    <!--<a-entity door-toggle class="intersectable" position="-15 2.5 8" rotation="0 0 0">-->
+
+        <!--<a-entity geometry="primitive: box; depth: 3; height: 5; width: 0.1" material="color: brown" position="0 0 -1.5"></a-entity>-->
+        <!--<a-entity geometry="primitive: sphere; radius: 0.25" material="color:yellow" position="0 0 -2.5"></a-entity>-->
+        <!--<a-animation attribute="rotation" begin="doorOpening" from="0 0 0" to="0 90 0" dur="500"></a-animation>-->
+        <!--<a-animation attribute="rotation" begin="doorClosing" from="0 90 0" to="0 0 0" dur="500"></a-animation>-->
+    <!--</a-entity>-->
+
+    <!--&lt;!&ndash;Clock &ndash;&gt;-->
+    <!--<a-entity position="0 5 -9.9">-->
+        <!--<a-gltf-model src="#clock" scale="0.5 0.5 0.5" rotation="90 0 0"></a-gltf-model>-->
+    <!--</a-entity>-->
+
+    <!--&lt;!&ndash;Picture &ndash;&gt;-->
+    <!--<a-entity  shadow = "receive：false" geometry="primitive: box; depth: 3; height: 0.1; width: 2.4" position="9 5 9.9" material="src: url(images/mengnalisha.jpg)") rotation="270 180 0">-->
+    <!--</a-entity>-->
+    <!--<a-entity  shadow = "receive：false" geometry="primitive: box; depth: 3; height: 0.1; width: 2.4" position="6 5 9.9" material="src: url(images/picture3.jpg)") rotation="270 180 0">-->
+    <!--</a-entity>-->
+    <!--<a-entity  shadow = "receive：false"  geometry="primitive: box; depth: 3; height: 0.1; width: 2.4" position="3 5 9.9" material="src: url(images/picture4.jpg)") rotation="270 180 0">-->
+    <!--</a-entity>-->
+    <!--<a-entity  shadow = "receive：false" geometry="primitive: box; depth: 3; height: 0.1; width: 2.4" position="0 5 9.9" material="src: url(images/picture.jpg)") rotation="270 180 0">-->
+    <!--</a-entity>-->
+    <!--<a-entity shadow = "receive：false"  geometry="primitive: box; depth: 3; height: 0.1; width: 2.4" position="-3 5 9.9" material="src: url(images/picture5.jpg)") rotation="270 180 0">-->
+    <!--</a-entity>-->
+    <!--<a-entity  shadow = "receive：false"   geometry="primitive: box; depth: 3; height: 0.1; width: 2.4" position="-6 5 9.9" material="src: url(images/picture6.jpg)") rotation="270 180 0">-->
+    <!--</a-entity>-->
+    <!--</a-entity>-->
+    <!--<a-entity  shadow = "receive：false"   geometry="primitive: box; depth: 3; height: 0.1; width: 2.4" position="-14.8 5 0.3" material="src: url(images/picture6.jpg)") rotation="270 90 0">-->
+    <!--</a-entity>-->
+
+    <!--&lt;!&ndash; Cup &ndash;&gt;-->
+    <!--<a-entity  shadow = "receive：false"  position="-10.5 1.35 -9.2" >-->
+        <!--<a-gltf-model src="#cup" scale="2 2 2"></a-gltf-model>-->
+    <!--</a-entity>-->
+
+    <!--&lt;!&ndash; RUG &ndash;&gt;-->
+    <!--<a-entity  shadow = "receive：false"      geometry="primitive: box; depth: 5; height: 0.2; width: 6" position="-7 0 0" material="src: url(images/rug.jpg); repeat: 5 6; roughness: 1; metalness: 0"></a-entity>-->
+
+    <!--&lt;!&ndash; North Baseboard &ndash;&gt;-->
+    <!--<a-entity  shadow = "receive：false"   geometry="primitive: cylinder; radius: 0.05; height: 30" rotation="0 0 90" position="0 0.05 -9.9" material="color: white"></a-entity>-->
+
+    <!--&lt;!&ndash; North Crown Molding &ndash;&gt;-->
+    <!--<a-entity  shadow = "receive：false"     geometry="primitive: cylinder; radius: 0.05; height: 30" rotation="0 0 90" position="0 9.95 -9.9" material="color: white"></a-entity>-->
+
+    <!--&lt;!&ndash; South Baseboard &ndash;&gt;-->
+    <!--<a-entity  shadow = "receive：false"       geometry="primitive: cylinder; radius: 0.05; height: 30" rotation="0 0 90" position="0 0.05 9.9" material="color: white"></a-entity>-->
+
+    <!--&lt;!&ndash; South Crown Molding &ndash;&gt;-->
+    <!--<a-entity    shadow = "receive：false"     geometry="primitive: cylinder; radius: 0.05; height: 30" rotation="0 0 90" position="0 9.95 9.9" material="color: white"></a-entity>-->
+
+    <!--&lt;!&ndash; East Baseboard &ndash;&gt;-->
+    <!--<a-entity    shadow = "receive：false"      geometry="primitive: cylinder; radius: 0.05; height: 20" rotation="90 0 0" position="14.9 0.05 0" material="color: white"></a-entity>-->
+
+    <!--&lt;!&ndash; East Crown Molding &ndash;&gt;-->
+    <!--<a-entity   shadow = "receive：false"   geometry="primitive: cylinder; radius: 0.05; height: 20" rotation="90 0 0" position="14.9 9.95 0" material="color: white"></a-entity>-->
+
+    <!--&lt;!&ndash; West Baseboard &ndash;&gt;-->
+    <!--<a-entity   shadow = "receive：false"     geometry="primitive: cylinder; radius: 0.05; height: 2" rotation="90 0 0" position="-14.9 0.05 9" material="color:white"></a-entity>-->
+    <!--<a-entity   shadow = "receive：false"    geometry="primitive: cylinder; radius: 0.05; height: 15" rotation="90 0 0" position="-14.9 0.05 -2.5" material="color:white"></a-entity>-->
+
+    <!--&lt;!&ndash; West Crown Molding &ndash;&gt;-->
+    <!--<a-entity     shadow = "receive：false"      geometry="primitive: cylinder; radius: 0.05; height: 20" rotation="90 0 0" position="-14.9 9.95 0" material="color: white"></a-entity>-->
+
+    <!--&lt;!&ndash;Piano&ndash;&gt;-->
+    <!--&lt;!&ndash;<a-entity position="-12.594 1 0" rotation="0 90 0" scale="0.1 0.5 0.3"&ndash;&gt;-->
+    <!--&lt;!&ndash;collada-model="assets/Models/12 Octave Keys.dae" id="Piano"></a-entity>&ndash;&gt;-->
+
+    <!--&lt;!&ndash;<a-entity geometry="primitive:box ;  depth: 0.2; height: 0.8; width: 0.4" position="-10.594 1 0" rotation="0 90 0"&ndash;&gt;-->
+    <!--&lt;!&ndash;material="shader: flat; side: double; transparent: true;&ndash;&gt;-->
+    <!--&lt;!&ndash;src: url(images/bug-finder-product.png)"></a-entity>&ndash;&gt;-->
+    <!--&lt;!&ndash;冰箱&ndash;&gt;-->
+    <!--&lt;!&ndash;<a-entity position="-6 0 -9" scale="2.3 2.3 1.2" collada-model="assets/Models/refrigerator.dae"&ndash;&gt;-->
+    <!--&lt;!&ndash;id="Refrigerator"&ndash;&gt;-->
+    <!--&lt;!&ndash;&gt;</a-entity>&ndash;&gt;-->
+
+    <!--&lt;!&ndash;<a-entity class="intersectable"     position="-6 0 -9" rotation="0 -180 0">&ndash;&gt;-->
+
+    <!--&lt;!&ndash;<a-gltf-model        src="assets/Models/1.gltf"     scale="0.02 0.02 0.02" shadow="receive: false"></a-gltf-model>&ndash;&gt;-->
+    <!--&lt;!&ndash;</a-entity>&ndash;&gt;-->
+
+
+    <!--&lt;!&ndash;football&ndash;&gt;-->
+    <!--&lt;!&ndash;<a-entity position="-12 0.4 -9" rotation="0 90 0" scale="0.3 0.3 0.3"&ndash;&gt;-->
+    <!--&lt;!&ndash;collada-model="assets/Models/football.dae" id="Ball"></a-entity>&ndash;&gt;-->
+
+    <!--&lt;!&ndash;<a-entity class="intersectable"     position="-6 0 -9" rotation="0 90 0">&ndash;&gt;-->
+
+    <!--&lt;!&ndash;<a-gltf-model        src="assets/Models/plant3.gltf"     scale="2 3 3" shadow="receive: false"></a-gltf-model>&ndash;&gt;-->
+    <!--&lt;!&ndash;</a-entity>&ndash;&gt;-->
+
+
+    <!--&lt;!&ndash;<a-entity position="-12 0.4 -6" rotation="0 90 0" scale="0.3 0.3 0.3"&ndash;&gt;-->
+    <!--&lt;!&ndash;collada-model="assets/Models/DesignChair1.dae" ></a-entity>&ndash;&gt;-->
+
+    <!--&lt;!&ndash;chair&ndash;&gt;-->
+    <!--&lt;!&ndash;<a-entity class="intersectable"   geometry="primitive: box;height: 2 "  material="src: url(images/picture6.jpg)"   position="-6 1 -5" rotation="0 90 0">&ndash;&gt;-->
+    <!--&lt;!&ndash;<a-gltf-model        src="assets/Models/Chair1.gltf"          scale="0.3 0.3 0.3" shadow="receive: false"></a-gltf-model>&ndash;&gt;-->
+    <!--&lt;!&ndash;</a-entity>&ndash;&gt;-->
+    <!--&lt;!&ndash; table &ndash;&gt;-->
+    <!--&lt;!&ndash;<a-entity obj-model="obj: #table-obj; mtl: #table-mtl" position="3.39 0 -0.06" rotation="0 45 0">&ndash;&gt;-->
+    <!--&lt;!&ndash;<a-text value="table" color="#51291a" rotation="-90 180 0" position="-6 1 -5" scale=".3 .3 .3"></a-text>&ndash;&gt;-->
+    <!--&lt;!&ndash;</a-entity>&ndash;&gt;-->
+
+    <!--<a-entity  position="3.39 0 -0.06" rotation="0 45 0">-->
+        <!--<a-gltf-model        src="#mysidetable"          scale="2.0 1.2 2.0" shadow="receive: false"></a-gltf-model>-->
+
+    <!--</a-entity>-->
+    <!--<a-entity  position="-6 0 -9" >-->
+        <!--<a-gltf-model        src="#refrigerator"        scale="2.3 2.3 1.2" shadow="receive: false"></a-gltf-model>-->
+
+    <!--</a-entity>-->
+
+    <!--<a-entity  position="-12 0.4 -9" >-->
+        <!--<a-gltf-model        src="#football"        scale="0.3 0.3 0.3" shadow="receive: false"></a-gltf-model>-->
+
+    <!--</a-entity>-->
+
+
+    <!--<a-entity  position="-12.594 1 0" >-->
+        <!--<a-gltf-model        src="#piano"     rotation="0 90 0" scale="0.1 0.5 0.3"   shadow="receive: false"></a-gltf-model>-->
+
+    <!--</a-entity>-->
+
+
+    <!--<a-entity static-body  shadow = "receive：true"  geometry="primitive: box; depth: 8; height: 0.3; width: 3" position="-6.594 1 0"-->
+              <!--scale="0.5 1 0.5"   rotation="0 90 0" material="shader: standard;-->
+<!--roughness: 1; src: url(images/mount.jpg)">-->
+        <!--<a-entity static-body    geometry="primitive: box; depth: 0.3; height: 2.2; width: 0.3" position="-1.2 -1 3.8"-->
+                  <!--rotation="0 90 0" material="shader: standard;-->
+<!--roughness: 1; src: url(images/mount.jpg)"></a-entity>-->
+        <!--<a-entity static-body geometry="primitive: box; depth: 0.3; height: 2.2; width: 0.3" position="1.2 -1 3.8"-->
+                  <!--rotation="0 90 0" material="shader: standard;-->
+<!--roughness: 1; src: url(images/mount.jpg)"></a-entity>-->
+        <!--<a-entity static-body geometry="primitive: box; depth: 0.3; height: 2.2; width: 0.3" position="1.2 -1 -3.8"-->
+                  <!--rotation="0 90 0" material="shader: standard;-->
+<!--roughness: 1; src: url(images/mount.jpg)"></a-entity>-->
+        <!--<a-entity static-body geometry="primitive: box; depth: 0.3; height: 2.2; width: 0.3" position="-1.2 -1 -3.8"-->
+                  <!--rotation="0 90 0" material="shader: standard;-->
+<!--roughness: 1; src: url(images/mount.jpg)"></a-entity>-->
+
+        <!--<a-entity geometry="primitive: box; depth: 0.4; height: 0.1; width: 1.8" position="0 0.2 0" rotation="0 90 0"-->
+                  <!--material="shader: standard;-->
+<!--roughness: 1; src: url(images/torch2.jpg)"></a-entity>-->
+    <!--</a-entity>-->
+
+
+</a-scene>
+</body>
+</html>
